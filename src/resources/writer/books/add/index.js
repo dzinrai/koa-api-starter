@@ -3,7 +3,7 @@ const Joi = require('@hapi/joi');
 const validate = require('middlewares/validate');
 
 const validBook = Joi.object({
-  _id: Joi.string() | Joi.object().required(),
+  _id: Joi.string().required(),
   title: Joi.string().required(),
   genre: Joi.string().valid('novel', 'poem').required(),
 });
@@ -14,7 +14,7 @@ const schema = Joi.object({
     .messages({
       'string.empty': 'ID is required',
     }),
-  book: Joi.object()
+  book: validBook
     .messages({
       'object.empty': 'Books is required',
     }),
@@ -22,13 +22,13 @@ const schema = Joi.object({
 
 
 async function validator(ctx, next) {
-  const { writer } = ctx.validatedData;
+  const book = ctx.validatedData;
 
   await next();
 }
 
 async function handler(ctx) {
-  const data = ctx.request.body;
+  const data = ctx.validatedData;
   const newBook = data.book;
   const results = await writerService.find({ _id: data.id });
   if (!results || !results.results) return;

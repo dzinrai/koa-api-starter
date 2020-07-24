@@ -8,5 +8,5 @@ async function handler(ctx) {
 }
 
 module.exports.register = (router) => {
-  router.get('/', handler);
+  router.get('/:id', handler);
 };

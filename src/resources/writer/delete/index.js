@@ -6,16 +6,10 @@ const schema = Joi.object({
   id: Joi.string()
     .trim()
     .messages({
-      'string.empty': 'ID is required',
-    }),
+      'any.required': 'ID is required',
+      'string.empty': 'ID is empty',
+    }).required(),
 });
-
-
-async function validator(ctx, next) {
-  const { writer } = ctx.validatedData;
-
-  await next();
-}
 
 async function handler(ctx) {
   const data = ctx.request.body;
@@ -23,5 +17,5 @@ async function handler(ctx) {
   if (deletedWriter) ctx.body = deletedWriter;
 }
 module.exports.register = (router) => {
-  router.delete('/', validate(schema), validator, handler);
+  router.delete('/', validate(schema), handler);
 };

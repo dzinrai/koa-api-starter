@@ -3,12 +3,6 @@ const Joi = require('@hapi/joi');
 const validate = require('middlewares/validate');
 const _ = require('lodash');
 
-const validBook = Joi.object({
-  _id: Joi.string() | Joi.object().required(),
-  title: Joi.string().required(),
-  genre: Joi.string().valid('novel', 'poem').required(),
-});
-
 const schema = Joi.object({
   id: Joi.string()
     .trim()
@@ -21,13 +15,6 @@ const schema = Joi.object({
       'string.empty': 'bookID is required',
     }),
 });
-
-
-async function validator(ctx, next) {
-  const { writer } = ctx.validatedData;
-
-  await next();
-}
 
 async function handler(ctx) {
   const data = ctx.request.body;
@@ -46,5 +33,5 @@ async function handler(ctx) {
 }
 
 module.exports.register = (router) => {
-  router.delete('/books', validate(schema), validator, handler);
+  router.delete('/books', validate(schema), handler);
 };
