@@ -3,7 +3,6 @@ const Joi = require('@hapi/joi');
 const validate = require('middlewares/validate');
 
 const validBook = Joi.object({
-  _id: Joi.string().required(),
   title: Joi.string().required(),
   genre: Joi.string().valid('novel', 'poem').required(),
 });
@@ -30,15 +29,13 @@ async function validator(ctx, next) {
 async function handler(ctx) {
   const data = ctx.validatedData;
   const newBook = data.book;
-  const results = await writerService.find({ _id: data.id });
-  if (!results || !results.results) return;
-  const currentWriter = results.results[0];
-  const books = Array.isArray(currentWriter.books) ? [...currentWriter.books, newBook] : [newBook];
-  const writer = await writerService.update({ _id: data.id}, (doc) => {
-    doc.books = books;
-    return doc;
+  const writer = await writerService.atomic.update({ _id: data.id}, {
+    $push: {
+      books: newBook
+    }
   });
-  if (writer) ctx.body = writer;
+  ctx.body = writer;
+  ctx.status = writer ? 200 : 400;
 }
 
 module.exports.register = (router) => {

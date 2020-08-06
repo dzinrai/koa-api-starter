@@ -20,9 +20,12 @@ const schema = Joi.object({
 
 async function handler(ctx) {
   const search = ctx.request.body;
-  const documentsCount = Number(search.pageNumber) * Number(search.documentsInPage);
-  const writers = await writerService.find({});
-  const result = _.sortBy(writers.results.slice(0, documentsCount), [search.sortBy]);
+  const writers = await writerService.find({}, {
+    page: Number(search.pageNumber),
+    perPage: Number(search.documentsInPage)
+  });
+  const result = _.sortBy(writers.results, [search.sortBy]);
+  ctx.status = result.length ? 200 : 400;
   ctx.body = {
     data: search.sortOrder === 'desc' ? result.reverse() : result, 
     meta: {

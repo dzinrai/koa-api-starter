@@ -14,7 +14,9 @@ const schema = Joi.object({
 async function handler(ctx) {
   const data = ctx.request.body;
   const deletedWriter = await writerService.remove({ '_id': data.id});
-  if (deletedWriter) ctx.body = deletedWriter;
+  ctx.body = deletedWriter;
+  if (deletedWriter) ctx.status = 200;
+  else ctx.status = 400;
 }
 module.exports.register = (router) => {
   router.delete('/', validate(schema), handler);

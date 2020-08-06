@@ -1,9 +1,8 @@
 const writerService = require('resources/writer/writer.service');
 
 async function handler(ctx) {
-  const dbqwe = await writerService.find({});
-  ctx.body = dbqwe;
-  
+  const testFullDb = await writerService.find({});
+  ctx.body = testFullDb;
 }
 
 module.exports.register = (router) => {

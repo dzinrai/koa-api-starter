@@ -28,11 +28,13 @@ async function validator(ctx, next) {
 async function handler(ctx) {
   const data = ctx.request.body;
   const { id, newBookList } = data;
-  const writer = await writerService.update({ _id: id}, (doc) => {
-    doc.books = newBookList ? newBookList : [];
-    return doc;
+  const writer = await writerService.atomic.update({ _id: id}, {
+    $set: {
+      books: newBookList ?? []
+    }
   });
-  if (writer) ctx.body = writer;
+  ctx.body = writer;
+  ctx.status = writer ? 200 : 400;
 }
 
 module.exports.register = (router) => {

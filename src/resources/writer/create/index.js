@@ -26,24 +26,17 @@ const schema = Joi.object({
   books: Joi.array().items(validBook).allow(null),
 });
 
-async function validator(ctx, next) {
-  const newWriter = ctx.validatedData;
-  newWriter.lastName = await capitalize(newWriter.lastName);
-  newWriter.firstName = await capitalize(newWriter.firstName);
-  await next();
-}
-
 async function handler(ctx) {
   const data = ctx.validatedData;
 
   const writer = await writerService.create({
-    firstName: data.firstName,
-    lastName: data.lastName,
+    firstName: capitalize(data.firstName),
+    lastName: capitalize(data.lastName),
     age: data.age,
     books: data.books
   });
   if (writer) ctx.body = writer;
 }
 module.exports.register = (router) => {
-  router.post('/', validate(schema), validator, handler);
+  router.post('/', validate(schema), handler);
 };

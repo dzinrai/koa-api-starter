@@ -19,14 +19,16 @@ async function validator(ctx, next) {
 
 async function handler(ctx) {
   const data = ctx.request.body;
-  const updatedWriter = await writerService.update({ '_id': data.id}, (doc) => {
-    if (data.firstName) doc.firstName = data.firstName;
-    if (data.lastName) doc.lastName = data.lastName;
-    if (data.age) doc.age = data.age;
-    if (data.books) doc.books = data.books;
-    return doc;
+  const updatedWriter = await writerService.atomic.update({ '_id': data.id},{
+    $set: {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      age: data.age,
+      books: data.books,
+    }
   });
-  if (updatedWriter) ctx.body = updatedWriter;
+  ctx.body = updatedWriter;
+  ctx.status = updatedWriter ? 200 : 400;
   
 }
 module.exports.register = (router) => {

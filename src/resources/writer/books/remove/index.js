@@ -18,18 +18,16 @@ const schema = Joi.object({
 
 async function handler(ctx) {
   const data = ctx.request.body;
-  const { id, bookID } = data;
-  const results = await writerService.find({ _id: id });
-  if (!results || !results.results) return;
-  const books = results.results[0].books;
-  _.remove(books, function(item) {
-    return item.id === bookID || item._id === bookID;
-  });
+  const { id, bookID } = data;  
   const writer = await writerService.update({ _id: id}, (doc) => {
-    doc.books = books;
+    const { books } = doc;
+    _.remove(books, function(item) {
+      return item._id === bookID;
+    });
     return doc;
   });
-  if (writer) ctx.body = writer;
+  ctx.body = writer;
+  ctx.status = writer ? 200 : 400;
 }
 
 module.exports.register = (router) => {

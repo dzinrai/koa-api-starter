@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi');
 
 const validBook = Joi.object({
-  _id: Joi.string() | Joi.object().required(),
+  _id: Joi.string().required(),
   title: Joi.string().required(),
   genre: Joi.string().valid('novel', 'poem').required(),
 });
