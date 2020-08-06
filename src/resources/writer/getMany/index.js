@@ -1,7 +1,6 @@
 const writerService = require('resources/writer/writer.service');
 const Joi = require('@hapi/joi');
 const validate = require('middlewares/validate');
-const _ = require('lodash');
 
 const schema = Joi.object({
   pageNumber: Joi.number()
@@ -22,14 +21,14 @@ async function handler(ctx) {
   const search = ctx.request.body;
   const writers = await writerService.find({}, {
     page: Number(search.pageNumber),
-    perPage: Number(search.documentsInPage)
+    perPage: Number(search.documentsInPage),
+    sort: search.sortOrder === 'desc' ? -1 : 1
   });
-  const result = _.sortBy(writers.results, [search.sortBy]);
-  ctx.status = result.length ? 200 : 400;
+  ctx.status = writers?.length ? 200 : 400;
   ctx.body = {
-    data: search.sortOrder === 'desc' ? result.reverse() : result, 
+    data: writers, 
     meta: {
-      numberOfAllDocuments: result.length
+      numberOfAllDocuments: writers?.length
     }
   };
 }
