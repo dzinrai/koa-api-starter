@@ -1,7 +1,6 @@
 const writerService = require('resources/writer/writer.service');
 const Joi = require('@hapi/joi');
 const validate = require('middlewares/validate');
-const _ = require('lodash');
 
 const schema = Joi.object({
   id: Joi.string()
@@ -18,14 +17,13 @@ const schema = Joi.object({
 
 async function handler(ctx) {
   const data = ctx.request.body;
-  const { id, bookID } = data;  
-  const writer = await writerService.update({ _id: id}, (doc) => {
-    const { books } = doc;
-    _.remove(books, function(item) {
-      return item._id === bookID;
+  const { id, bookID } = data;
+  const writer = await writerService.atomic.update({ _id: id },
+    {
+      $pull: {
+        books: { _id: bookID },
+      },
     });
-    return doc;
-  });
   ctx.body = writer;
   ctx.status = writer ? 200 : 400;
 }

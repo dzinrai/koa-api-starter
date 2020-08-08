@@ -1,6 +1,7 @@
 const writerService = require('resources/writer/writer.service');
 const Joi = require('@hapi/joi');
 const validate = require('middlewares/validate');
+const shortid = require('shortid');
 
 const validBook = Joi.object({
   title: Joi.string().required(),
@@ -19,25 +20,19 @@ const schema = Joi.object({
     }),
 });
 
-
-async function validator(ctx, next) {
-  const book = ctx.validatedData;
-
-  await next();
-}
-
 async function handler(ctx) {
   const data = ctx.validatedData;
   const newBook = data.book;
-  const writer = await writerService.atomic.update({ _id: data.id}, {
+  newBook._id = shortid.generate();
+  const writer = await writerService.atomic.update({ _id: data.id }, {
     $push: {
-      books: newBook
-    }
+      books: newBook,
+    },
   });
   ctx.body = writer;
   ctx.status = writer ? 200 : 400;
 }
 
 module.exports.register = (router) => {
-  router.post('/books', validate(schema), validator, handler);
+  router.post('/books', validate(schema), handler);
 };

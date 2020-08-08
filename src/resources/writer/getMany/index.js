@@ -7,14 +7,16 @@ const schema = Joi.object({
     .integer().min(0)
     .messages({
       'any.required': 'pageNumber is required',
-    }).required(),
+    })
+    .required(),
   documentsInPage: Joi.number()
     .integer().min(1).max(5)
     .messages({
       'any.required': 'documentsInPage is required',
-    }).required(),
+    })
+    .required(),
   sortBy: Joi.string().valid('createdOn', 'firstName', 'lastName', 'id').default('id'),
-  sortOrder: Joi.string().valid('desc', 'asc')
+  sortOrder: Joi.string().valid('desc', 'asc'),
 });
 
 async function handler(ctx) {
@@ -22,14 +24,14 @@ async function handler(ctx) {
   const writers = await writerService.find({}, {
     page: Number(search.pageNumber),
     perPage: Number(search.documentsInPage),
-    sort: search.sortOrder === 'desc' ? -1 : 1
+    sort: search.sortOrder === 'desc' ? -1 : 1,
   });
-  ctx.status = writers?.length ? 200 : 400;
+  ctx.status = writers.length ? 200 : 400;
   ctx.body = {
-    data: writers, 
+    data: writers,
     meta: {
-      numberOfAllDocuments: writers?.length
-    }
+      numberOfAllDocuments: writers.length,
+    },
   };
 }
 
